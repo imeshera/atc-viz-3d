@@ -13,6 +13,8 @@ const samples = {
 };
 
 const sources = new Map();
+const fresh = new Map();
+const FRESH_MS = 8_000;
 
 function sourceFor(cityId, env) {
   const city = cityById(cityId);
@@ -30,8 +32,13 @@ function sourceFor(cityId, env) {
 export async function onRequest({ request, env }) {
   if (request.method !== 'GET') return new Response(null, { status: 405 });
   try {
-    const city = new URL(request.url).searchParams.get('city');
+    const city = new URL(request.url).searchParams.get('city') || 'chicago';
+    const cached = fresh.get(city);
+    if (cached && Date.now() - cached.at < FRESH_MS) {
+      return Response.json(cached.body, { headers: { 'Cache-Control': 'no-store' } });
+    }
     const body = await sourceFor(city, env).snapshot();
+    fresh.set(city, { at: Date.now(), body });
     return Response.json(body, { headers: { 'Cache-Control': 'no-store' } });
   } catch {
     return Response.json(
