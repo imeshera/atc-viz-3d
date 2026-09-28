@@ -1,99 +1,19 @@
 import { existsSync, readFileSync } from 'node:fs';
-import { boardBox } from '../src/geo/project.js';
 import { cityById } from '../src/cities.js';
 import { createFlightHandler } from './flight.js';
+import { POLL_MS, createTrafficSource as createSource, normalizeSample } from './feed.js';
 
-const TOKEN_URL = 'https://auth.opensky-network.org/auth/realms/opensky-network/protocol/openid-connect/token';
-const STATES_URL = 'https://opensky-network.org/api/states/all';
-export const POLL_MS = 10_000;
+export { POLL_MS };
 
 export function createTrafficSource({
   clientId = '',
   clientSecret = '',
   cityId = 'chicago',
+  sample,
 } = {}) {
   const city = cityById(cityId);
-  const box = boardBox(city.anchor, city.half);
-  const samplePath = new URL(`../src/data/${city.sample}`, import.meta.url);
-  let token = '';
-  let tokenExpires = 0;
-  let sample = readSample(samplePath);
-
-  async function fetchLive() {
-    const authed = Boolean(clientId && clientSecret);
-    let response = await requestStates(authed ? await getToken() : '');
-    if (response.status === 401 && authed) {
-      token = '';
-      response = await requestStates(await getToken());
-    }
-    if (!response.ok) {
-      const error = new Error(`OpenSky responded ${response.status}`);
-      error.status = response.status;
-      throw error;
-    }
-    const body = await response.json();
-    return {
-      source: 'live',
-      time: body.time,
-      aircraft: normalizeStates(body.states),
-    };
-  }
-
-  async function snapshot() {
-    try {
-      return await fetchLive();
-    } catch {
-      return replayFrame();
-    }
-  }
-
-  function replayFrame() {
-    if (!sample.frames.length) sample = readSample(samplePath);
-    if (!sample.frames.length) {
-      return { source: 'replay', time: Math.floor(Date.now() / 1000), aircraft: [] };
-    }
-    const intervalMs = (sample.interval || POLL_MS / 1000) * 1000;
-    const index = Math.floor(Date.now() / intervalMs) % sample.frames.length;
-    const frame = sample.frames[index];
-    return { source: 'replay', time: frame.time, aircraft: frame.aircraft };
-  }
-
-  async function getToken() {
-    if (token && Date.now() < tokenExpires) return token;
-    const body = new URLSearchParams({
-      grant_type: 'client_credentials',
-      client_id: clientId,
-      client_secret: clientSecret,
-    });
-    const response = await fetch(TOKEN_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body,
-    });
-    if (!response.ok) {
-      const error = new Error(`OpenSky auth responded ${response.status}`);
-      error.status = response.status;
-      throw error;
-    }
-    const json = await response.json();
-    token = json.access_token;
-    tokenExpires = Date.now() + Math.max(30, (json.expires_in || 1800) - 60) * 1000;
-    return token;
-  }
-
-  async function requestStates(accessToken) {
-    const params = new URLSearchParams({
-      lamin: String(box.lamin),
-      lomin: String(box.lomin),
-      lamax: String(box.lamax),
-      lomax: String(box.lomax),
-    });
-    const headers = {};
-    if (accessToken) headers.Authorization = `Bearer ${accessToken}`;
-    return fetch(`${STATES_URL}?${params}`, { headers });
-  }
-
-  return { fetchLive, snapshot, replayFrame, box };
+  const loaded = sample || readSample(new URL(`../src/data/${city.sample}`, import.meta.url));
+  return createSource({ clientId, clientSecret, cityId: city.id, sample: loaded });
 }
 
 export function createTrafficHandler(env = {}) {
@@ -158,37 +78,10 @@ export function trafficPlugin(env) {
 }
 
 function readSample(samplePath) {
-  if (!existsSync(samplePath)) return { interval: POLL_MS / 1000, frames: [] };
+  if (!existsSync(samplePath)) return normalizeSample(null);
   try {
-    const parsed = JSON.parse(readFileSync(samplePath, 'utf8'));
-    return {
-      interval: parsed.interval || POLL_MS / 1000,
-      frames: Array.isArray(parsed.frames) ? parsed.frames : [],
-    };
+    return normalizeSample(JSON.parse(readFileSync(samplePath, 'utf8')));
   } catch {
-    return { interval: POLL_MS / 1000, frames: [] };
+    return normalizeSample(null);
   }
-}
-
-function normalizeStates(states) {
-  if (!Array.isArray(states)) return [];
-  const aircraft = [];
-  for (const row of states) {
-    const lat = row[6];
-    const lon = row[5];
-    if (lat == null || lon == null) continue;
-    const callsign = typeof row[1] === 'string' ? row[1].trim() : '';
-    aircraft.push({
-      id: row[0],
-      callsign,
-      lat,
-      lon,
-      altM: row[7],
-      gs: row[9] ?? 0,
-      track: row[10] ?? 0,
-      vs: row[11],
-      onGround: Boolean(row[8]),
-    });
-  }
-  return aircraft;
 }

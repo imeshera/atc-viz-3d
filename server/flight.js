@@ -4,7 +4,7 @@ const AIRCRAFT_URL = 'https://api.adsb.lol/v2/hex';
 const ROUTE_URL = 'https://vrs-standing-data.adsb.lol/routes';
 const CACHE_MS = 10 * 60 * 1000;
 
-export function createFlightHandler(env = {}) {
+export function createFlightLookup(env = {}) {
   const cache = new Map();
   let token = '';
   let tokenExpires = 0;
@@ -120,6 +120,12 @@ export function createFlightHandler(env = {}) {
     tokenExpires = Date.now() + Math.max(30, (json.expires_in || 1800) - 60) * 1000;
     return token;
   }
+
+  return lookup;
+}
+
+export function createFlightHandler(env = {}) {
+  const lookup = createFlightLookup(env);
 
   return async function flightHandler(req, res) {
     if (req.method !== 'GET') {
