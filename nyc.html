@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>New York — Airspace</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='3' fill='%233ae7ff'/%3E%3C/svg%3E" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body data-city="nyc">
+    <canvas id="view"></canvas>
+    <div class="hud">
+      <div class="top">
+        <span class="mark">Live</span>
+        <span class="count"></span>
+        <span class="switches"></span>
+      </div>
+      <div class="legend">
+        <span><i class="swatch cruise"></i>Cruise</span>
+        <span><i class="swatch climb"></i>Climb</span>
+        <span><i class="swatch terminal"></i>Terminal</span>
+      </div>
+      <div class="hint">
+        <span>Drag to orbit</span>
+        <span class="sep">·</span>
+        <span>Scroll to zoom</span>
+        <button class="reset" type="button">Reset</button>
+      </div>
+      <div class="tip" hidden>
+        <div class="tip-cs"></div>
+        <div class="tip-sub" hidden></div>
+        <div class="tip-meta"></div>
+        <div class="tip-route" hidden></div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

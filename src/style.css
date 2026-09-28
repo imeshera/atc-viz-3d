@@ -1,0 +1,215 @@
+:root {
+  color-scheme: dark;
+  --ink: rgba(255, 255, 255, 0.78);
+  --muted: rgba(255, 255, 255, 0.42);
+  --faint: rgba(255, 255, 255, 0.28);
+  --cruise: #3ae7ff;
+  --climb: #d4f542;
+  --terminal: #ff4a1a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: #000;
+  overflow: hidden;
+  font-family: Inter, "SF Pro Display", "Helvetica Neue", sans-serif;
+  touch-action: none;
+}
+
+#view {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+  cursor: grab;
+}
+
+#view:active {
+  cursor: grabbing;
+}
+
+.hud {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+.top,
+.legend,
+.hint {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.top {
+  top: 26px;
+  left: 30px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.mark {
+  color: var(--ink);
+}
+
+.count {
+  color: var(--faint);
+  letter-spacing: 0.12em;
+}
+
+.switches {
+  display: contents;
+}
+
+a.switch {
+  pointer-events: auto;
+  color: var(--faint);
+  text-decoration: none;
+}
+
+a.switch:hover,
+a.switch.is-on {
+  color: var(--ink);
+}
+
+a.switch.is-on {
+  pointer-events: none;
+}
+
+.legend {
+  left: 30px;
+  bottom: 26px;
+  gap: 18px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.swatch {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  box-shadow: 0 0 10px currentColor;
+}
+
+.swatch.cruise {
+  background: var(--cruise);
+  color: var(--cruise);
+}
+
+.swatch.climb {
+  background: var(--climb);
+  color: var(--climb);
+}
+
+.swatch.terminal {
+  background: var(--terminal);
+  color: var(--terminal);
+}
+
+.hint {
+  right: 30px;
+  bottom: 26px;
+  gap: 10px;
+  color: var(--faint);
+}
+
+.sep {
+  opacity: 0.7;
+}
+
+button.reset {
+  pointer-events: auto;
+  margin-left: 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+button.reset:hover {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.tip {
+  position: absolute;
+  left: 0;
+  top: 0;
+  min-width: 168px;
+  max-width: 260px;
+  padding: 9px 11px 10px;
+  border-radius: 10px;
+  background: rgba(6, 8, 12, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(16px);
+}
+
+.tip-cs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.tip-cs::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--c, white);
+  box-shadow: 0 0 8px var(--c, white);
+}
+
+.tip-sub,
+.tip-meta,
+.tip-route {
+  margin-top: 3px;
+  margin-left: 15px;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+.tip-route {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+@media (max-width: 720px) {
+  .hint span:not(:last-child),
+  .sep {
+    display: none;
+  }
+
+  .top,
+  .legend,
+  .hint {
+    left: 16px;
+    right: 16px;
+  }
+
+  .hint {
+    left: auto;
+  }
+}
