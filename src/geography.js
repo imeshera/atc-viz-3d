@@ -23,6 +23,41 @@ import dcWaters from './geo/dc/waters.json';
 import dcRoads from './geo/dc/roads.json';
 import dcAirports from './geo/dc/airports.json';
 import dcBuildings from './geo/dc/buildings.json';
+import phlCoasts from './geo/phl/coasts.json';
+import phlWaters from './geo/phl/waters.json';
+import phlRoads from './geo/phl/roads.json';
+import phlAirports from './geo/phl/airports.json';
+import phlBuildings from './geo/phl/buildings.json';
+import sfCoasts from './geo/sf/coasts.json';
+import sfWaters from './geo/sf/waters.json';
+import sfRoads from './geo/sf/roads.json';
+import sfAirports from './geo/sf/airports.json';
+import sfBuildings from './geo/sf/buildings.json';
+import bosCoasts from './geo/bos/coasts.json';
+import bosWaters from './geo/bos/waters.json';
+import bosRoads from './geo/bos/roads.json';
+import bosAirports from './geo/bos/airports.json';
+import bosBuildings from './geo/bos/buildings.json';
+import atlCoasts from './geo/atl/coasts.json';
+import atlWaters from './geo/atl/waters.json';
+import atlRoads from './geo/atl/roads.json';
+import atlAirports from './geo/atl/airports.json';
+import atlBuildings from './geo/atl/buildings.json';
+import miaCoasts from './geo/mia/coasts.json';
+import miaWaters from './geo/mia/waters.json';
+import miaRoads from './geo/mia/roads.json';
+import miaAirports from './geo/mia/airports.json';
+import miaBuildings from './geo/mia/buildings.json';
+import dalCoasts from './geo/dal/coasts.json';
+import dalWaters from './geo/dal/waters.json';
+import dalRoads from './geo/dal/roads.json';
+import dalAirports from './geo/dal/airports.json';
+import dalBuildings from './geo/dal/buildings.json';
+import seaCoasts from './geo/sea/coasts.json';
+import seaWaters from './geo/sea/waters.json';
+import seaRoads from './geo/sea/roads.json';
+import seaAirports from './geo/sea/airports.json';
+import seaBuildings from './geo/sea/buildings.json';
 import { METERS_PER_UNIT, clipPolyline, heightUnits, project, shoreXAt } from './geo/project.js';
 
 const CHICAGO_GEO = {
@@ -58,6 +93,90 @@ const NYC_GEO = {
   water: null,
 };
 
+const PHL_GEO = {
+  shore: [],
+  coasts: phlCoasts,
+  waters: phlWaters,
+  river: [],
+  roads: phlRoads,
+  airports: phlAirports,
+  buildings: phlBuildings,
+  water: null,
+  edgeHeight: 80,
+};
+
+const SF_GEO = {
+  shore: [],
+  coasts: sfCoasts,
+  waters: sfWaters,
+  river: [],
+  roads: sfRoads,
+  airports: sfAirports,
+  buildings: sfBuildings,
+  water: null,
+  edgeHeight: 80,
+};
+
+const BOS_GEO = {
+  shore: [],
+  coasts: bosCoasts,
+  waters: bosWaters,
+  river: [],
+  roads: bosRoads,
+  airports: bosAirports,
+  buildings: bosBuildings,
+  water: null,
+  edgeHeight: 80,
+};
+
+const ATL_GEO = {
+  shore: [],
+  coasts: atlCoasts,
+  waters: atlWaters,
+  river: [],
+  roads: atlRoads,
+  airports: atlAirports,
+  buildings: atlBuildings,
+  water: null,
+  edgeHeight: 80,
+};
+
+const MIA_GEO = {
+  shore: [],
+  coasts: miaCoasts,
+  waters: miaWaters,
+  river: [],
+  roads: miaRoads,
+  airports: miaAirports,
+  buildings: miaBuildings,
+  water: null,
+  edgeHeight: 80,
+};
+
+const DAL_GEO = {
+  shore: [],
+  coasts: dalCoasts,
+  waters: dalWaters,
+  river: [],
+  roads: dalRoads,
+  airports: dalAirports,
+  buildings: dalBuildings,
+  water: null,
+  edgeHeight: 80,
+};
+
+const SEA_GEO = {
+  shore: [],
+  coasts: seaCoasts,
+  waters: seaWaters,
+  river: [],
+  roads: seaRoads,
+  airports: seaAirports,
+  buildings: seaBuildings,
+  water: null,
+  edgeHeight: 80,
+};
+
 const DC_GEO = {
   shore: [],
   coasts: dcCoasts,
@@ -74,6 +193,13 @@ export const GEOGRAPHY = {
   chicago: CHICAGO_GEO,
   lax: LAX_GEO,
   nyc: NYC_GEO,
+  phl: PHL_GEO,
+  sf: SF_GEO,
+  bos: BOS_GEO,
+  atl: ATL_GEO,
+  mia: MIA_GEO,
+  dal: DAL_GEO,
+  sea: SEA_GEO,
   dc: DC_GEO,
 };
 

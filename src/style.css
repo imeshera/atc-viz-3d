@@ -54,18 +54,48 @@ body {
 .top {
   top: 26px;
   left: 30px;
-  letter-spacing: 0.16em;
+  right: 30px;
+  gap: 10px;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   font-weight: 600;
+  flex-wrap: wrap;
 }
 
-.mark {
+.modes {
+  display: contents;
+}
+
+button.mode {
+  pointer-events: auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  white-space: nowrap;
+  color: var(--faint);
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+}
+
+button.mode:hover,
+button.mode.is-on {
   color: var(--ink);
+}
+
+button.mode.is-miss {
+  color: var(--terminal);
+}
+
+button.mode[hidden] {
+  display: none;
 }
 
 .count {
   color: var(--faint);
   letter-spacing: 0.12em;
+  white-space: nowrap;
 }
 
 .switches {
@@ -76,6 +106,7 @@ a.switch {
   pointer-events: auto;
   color: var(--faint);
   text-decoration: none;
+  white-space: nowrap;
 }
 
 a.switch:hover,

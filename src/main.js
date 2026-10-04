@@ -43,7 +43,19 @@ const tipSub = document.querySelector('.tip-sub');
 const tipMeta = document.querySelector('.tip-meta');
 const tipRoute = document.querySelector('.tip-route');
 const countEl = document.querySelector('.count');
-const markEl = document.querySelector('.mark');
+const modesEl = document.querySelector('.modes');
+const modeButtons = {};
+for (const id of ['live', 'replay']) {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'mode';
+  button.textContent = id === 'live' ? 'Live' : 'Replay';
+  button.setAttribute('aria-pressed', id === 'live' ? 'true' : 'false');
+  if (id === 'live') button.classList.add('is-on');
+  if (id === 'replay') button.hidden = true;
+  modesEl?.append(button);
+  modeButtons[id] = button;
+}
 
 const renderer = new THREE.WebGLRenderer({
   canvas,
@@ -92,9 +104,32 @@ const traffic = createTraffic({
   anchor,
   half: city.half,
   cityId: city.id,
-  onStatus(source) {
-    markEl.textContent = source === 'live' ? 'Live' : 'Replay';
+  onStatus({ mode, source }) {
+    paintMode(mode, source);
   },
+});
+
+function paintMode(mode, source) {
+  const missed = mode === 'live' && source !== 'live';
+  const showingReplay = mode === 'replay' || missed;
+  if (modeButtons.replay) modeButtons.replay.hidden = !showingReplay;
+  modeButtons.live?.classList.toggle('is-on', !showingReplay);
+  modeButtons.live?.classList.toggle('is-miss', missed);
+  modeButtons.live?.setAttribute('aria-pressed', !showingReplay ? 'true' : 'false');
+  modeButtons.replay?.classList.toggle('is-on', showingReplay);
+  modeButtons.replay?.setAttribute('aria-pressed', showingReplay ? 'true' : 'false');
+  if (modeButtons.live) {
+    modeButtons.live.title = missed ? 'Live feed did not answer. Click to try again.' : 'Try the live feed';
+  }
+}
+
+modeButtons.replay?.addEventListener('click', () => {
+  paintMode('replay', 'replay');
+  traffic.setMode('replay');
+});
+modeButtons.live?.addEventListener('click', () => {
+  paintMode('live', 'live');
+  traffic.setMode('live');
 });
 countEl.textContent = '0 tracks';
 
@@ -158,7 +193,7 @@ Promise.race([
   document.fonts.load('700 180px Inter'),
   new Promise((resolve) => setTimeout(resolve, 1200)),
 ]).then(() => {
-  scene.add(createLabel(city.label, city.labelAt));
+  scene.add(createLabel(city.label, city.labelAt, city.labelScale));
   traffic.start();
   frame();
 });
@@ -249,7 +284,7 @@ function createGrid(size, divisions) {
   return grid;
 }
 
-function createLabel(text, at) {
+function createLabel(text, at, scale = 1) {
   const font = '700 180px Inter, "SF Pro Display", "Helvetica Neue", sans-serif';
   const measure = document.createElement('canvas').getContext('2d');
   measure.font = font;
@@ -283,7 +318,7 @@ function createLabel(text, at) {
     depthWrite: true,
   });
   const sprite = new THREE.Sprite(material);
-  const worldHeight = 7.6;
+  const worldHeight = 7.6 * scale;
   sprite.scale.set(worldHeight * (width / height), worldHeight, 1);
   sprite.center.set(0.5, 0);
   sprite.position.set(at[0], at[1], at[2]);

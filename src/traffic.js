@@ -9,34 +9,52 @@ export const TRAIL_SAMPLES = 36;
 export function createTraffic({ anchor, half, cityId = 'chicago', onStatus }) {
   const tracks = new Map();
   let timer = 0;
-  let polling = false;
+  let ticket = 0;
+  let mode = 'live';
+  let shown = '';
 
-  async function poll() {
-    if (polling || document.hidden) return;
-    polling = true;
+  async function poll(attempt = false) {
+    if (document.hidden) return;
+    const mine = ++ticket;
+    const requested = mode;
     const started = performance.now();
     try {
-      const response = await fetch(`/api/traffic?city=${cityId}`);
+      const params = new URLSearchParams({ city: cityId, mode: requested });
+      if (attempt) params.set('attempt', '1');
+      const response = await fetch(`/api/traffic?${params}`);
       if (!response.ok) throw new Error(String(response.status));
       const body = await response.json();
+      if (mine !== ticket) return;
+      const source = body.source === 'live' ? 'live' : 'replay';
+      if (shown && shown !== source) tracks.clear();
+      shown = source;
       ingest(body);
-      onStatus?.(body.source === 'live' ? 'live' : 'replay');
+      onStatus?.({ mode: requested, source });
     } catch {
-      onStatus?.('replay');
-    } finally {
-      polling = false;
+      if (mine !== ticket) return;
+      onStatus?.({ mode: requested, source: 'replay' });
     }
-    if (document.hidden) return;
+    if (mine !== ticket || document.hidden) return;
     const wait = Math.max(0, POLL_MS - (performance.now() - started));
-    timer = window.setTimeout(poll, wait);
+    timer = window.setTimeout(() => poll(false), wait);
+  }
+
+  function setMode(next) {
+    const requested = next === 'live' ? 'live' : 'replay';
+    if (requested === mode && requested !== 'live') return;
+    mode = requested;
+    tracks.clear();
+    shown = '';
+    window.clearTimeout(timer);
+    poll(requested === 'live');
   }
 
   function start() {
     document.addEventListener('visibilitychange', () => {
       window.clearTimeout(timer);
-      if (!document.hidden) poll();
+      if (!document.hidden) poll(false);
     });
-    poll();
+    poll(true);
   }
 
   function ingest(body) {
@@ -138,7 +156,7 @@ export function createTraffic({ anchor, half, cityId = 'chicago', onStatus }) {
     return list;
   }
 
-  return { start, poses };
+  return { start, poses, setMode };
 }
 
 function interpolate(track, now) {

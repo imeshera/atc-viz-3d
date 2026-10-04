@@ -38,7 +38,10 @@ export function createTrafficHandler(env = {}) {
       return;
     }
     const url = new URL(req.url || '/', 'http://localhost');
-    const body = await sourceFor(url.searchParams.get('city')).snapshot();
+    const source = sourceFor(url.searchParams.get('city'));
+    const body = url.searchParams.get('mode') === 'live'
+      ? await source.snapshot()
+      : source.replayFrame();
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Cache-Control', 'no-store');

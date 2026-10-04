@@ -7,6 +7,7 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 5173,
       strictPort: true,
+      allowedHosts: ['.trycloudflare.com'],
     },
     build: {
       rollupOptions: {
@@ -14,6 +15,13 @@ export default defineConfig(({ mode }) => {
           chicago: 'index.html',
           lax: 'lax.html',
           nyc: 'nyc.html',
+          phl: 'phl.html',
+          sf: 'sf.html',
+          bos: 'bos.html',
+          atl: 'atl.html',
+          mia: 'mia.html',
+          dal: 'dal.html',
+          sea: 'sea.html',
           dc: 'dc.html',
         },
       },
